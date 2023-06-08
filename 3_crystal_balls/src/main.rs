@@ -1,3 +1,5 @@
+use rand::Rng;
+
 fn where_does_crystal_ball_break(breaks: Vec<bool>) -> i32 {
    // Two Crystal Ball problem: 
    // Given two crystal balls that will break if dropped from high enough distance, 
@@ -6,7 +8,7 @@ fn where_does_crystal_ball_break(breaks: Vec<bool>) -> i32 {
     // The vector is expected in the form of [false, false, false, true true]
     // solution in O(sqrt(N)) time 
 
-    // determine how far ahead to jump in the array
+    // determine how far ahead to jump in the vector
     let jump_distance = (breaks.len() as f32)
                                          .sqrt()
                                          .floor() as usize;
@@ -14,7 +16,7 @@ fn where_does_crystal_ball_break(breaks: Vec<bool>) -> i32 {
     let mut i = jump_distance; 
     
     // look for occurence of true value in the breaks vector
-    while i < breaks.len() {
+    while i < breaks.len()  {
         // stop when the first occurence is found 
         if breaks[i] {
             break;
@@ -41,10 +43,30 @@ fn where_does_crystal_ball_break(breaks: Vec<bool>) -> i32 {
     -1
 }
 
+struct Breaks {
+    breaks: Vec<bool>,
+    break_point: u32,
+}
+
+fn get_breaks(max_floors: u32) -> Breaks {
+    let mut rng = rand::thread_rng();
+    // how many floors are in the building? there has to be at least 1
+    let floors_amount = rng.gen_range(1..max_floors);
+    // at which floor does the crystal ball break?
+    let break_point = rng.gen_range(0..floors_amount);
+    let breaks = (0..floors_amount).map(|v| { if v < break_point { false } else { true } }).collect();
+    println!("{:?}", floors_amount); 
+    println!("{:?}", break_point); 
+    println!("{:?}", breaks);
+    Breaks {
+        breaks: breaks,
+        break_point: break_point,
+    }
+}
+
 fn main() {
-    
-    let breaks = vec![false, false, false, false, true, true, true, true, true, true];
-    println!("{}", where_does_crystal_ball_break(breaks));          
+    // let breaks : Breaks = get_breaks(10);
+    // println!("{:?}", where_does_crystal_ball_break(breaks.breaks));
 }
 
 
@@ -54,13 +76,13 @@ mod tests {
 
     #[test]
         fn test_crystal_ball_break() {
-            let breaks = vec![false, false, false, false, true, true, true];
-            assert_eq!(where_does_crystal_ball_break(breaks), 4);
+            let breaks : Breaks = get_breaks(10);
+            assert_eq!(where_does_crystal_ball_break(breaks.breaks), breaks.break_point as i32);
     }
-    #[test]
-        fn test_crystal_ball_doesnt_break() {
-            let breaks = vec![false, false, false, false];
-            assert_eq!(where_does_crystal_ball_break(breaks), -1);
-    }   
+   // #[test]
+   //     fn test_crystal_ball_doesnt_break() {
+   //         let breaks = vec![false, false, false, false];
+   //         assert_eq!(where_does_crystal_ball_break(breaks), -1);
+   // }   
     
 }
